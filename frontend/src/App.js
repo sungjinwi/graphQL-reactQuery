@@ -3,26 +3,36 @@ import { useQuery, gql } from '@apollo/client';
 
 import './App.css';
 
-const GET_HELLO = gql`
-  query ExampleQuery {
-    hello
+
+const GET_USERS = gql`
+  query UsersQuery {
+    getUsers {
+      name
+      age
+    }
   }
-`;
+`
+
 function App() {
 
-  function DisplayLocations() {
-    const { loading, error, data } = useQuery(GET_HELLO);
+  function DisplayUsers() {
+    const { loading, error, data } = useQuery(GET_USERS);
   
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error : {error.message}</p>;
-  
-    return <div>'data :' {data.hello}</div>
+    
+    return (data.getUsers.map(user=> 
+      <>
+        <div>{user.name}</div>
+        <div>{user.age}</div>
+      </>
+    ))
     ;
   }
 
   return (
     <>
-      <DisplayLocations />
+      <DisplayUsers />
     </>
   );
 }

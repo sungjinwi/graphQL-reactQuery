@@ -17,31 +17,34 @@ const pool = mysql.createPool({
 });
 
 
-const callApi = async ()=> {
-  try {
-    const connection = await pool.getConnection();
-    const [result] = await connection.query('select * from test');
-    console.log(result)
-  }
-  catch (e) {
-    throw e
-  }
-}
-
-await callApi();
-
 const app = express();
 
 const typeDefs = `
-type Query {
-  hello: String
-}
+  type User {
+    name: String
+    age: Int
+  }
+
+  type Query {
+    hello: String,
+    getUsers: [User]
+  }
 `;
 
 const resolvers = {
   Query: {
     hello: () => 'Hello, world!',
-  },
+    getUsers: async ()=> {
+      try {
+        const connection = await pool.getConnection();
+        const [result] = await connection.query('select * from test');
+        return result
+      }
+      catch (e) {
+        throw e
+      }
+    }
+  }
 };
 
 const server = new ApolloServer({
