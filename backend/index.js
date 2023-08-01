@@ -56,7 +56,6 @@ const resolvers = {
     addUser: async (parent, args, contextValue, info) => {
       try {
         console.log(args)
-        console.log("ssssss")
         const connection = await pool.getConnection();
         const [result] = await connection.query(`insert into test(name,age) values (?,?)`, [args.name, args.age]);
         connection.release()
