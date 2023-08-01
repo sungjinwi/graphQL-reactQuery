@@ -27,18 +27,40 @@ const typeDefs = `
 
   type Query {
     hello: String,
-    getUsers: [User]
+    getUsers(name:String): [User]
+  }
+
+  type Mutation {
+    addUser(name:String, age: Int): User
   }
 `;
 
 const resolvers = {
   Query: {
-    hello: () => 'Hello, world!',
-    getUsers: async ()=> {
+    hello: () => 'Hello, World!',
+    getUsers: async (parent, args, contextValue, info)=> {
       try {
         const connection = await pool.getConnection();
-        const [result] = await connection.query('select * from test');
+        console.log(args)
+        const [result] = await connection.query('select * from test WHERE name = ?', [args.name]);
+        connection.release()
         return result
+      }
+      catch (e) {
+        throw e
+      }
+
+    }
+  },
+  Mutation: {
+    addUser: async (parent, args, contextValue, info) => {
+      try {
+        console.log(args)
+        console.log("ssssss")
+        const connection = await pool.getConnection();
+        const [result] = await connection.query(`insert into test(name,age) values (?,?)`, [args.name, args.age]);
+        connection.release()
+        return result;
       }
       catch (e) {
         throw e
