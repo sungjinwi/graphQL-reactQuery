@@ -1,6 +1,7 @@
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
-import mysql from 'mysql2/promise';
+import { PrismaClient } from '@prisma/client'
+
 import dotenv from 'dotenv'
 
 import cors from 'cors';
@@ -8,61 +9,69 @@ import express from 'express';
 
 dotenv.config();
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE
-});
-
-
 const app = express();
 
+const prisma = new PrismaClient()
+
 const typeDefs = `
-  type User {
-    name: String
-    age: Int
+  type Movie {
+    id: Int
+    title: String
+    director: String
   }
 
   type Query {
     hello: String,
-    getUsers(name:String): [User]
+    getMovies: [Movie]
   }
 
   type Mutation {
-    addUser(name:String, age: Int): User
+    addMovie(title: String, director: String) : Movie
   }
 `;
 
+async function getAllMovies() {
+  
+  const allMovies = await prisma.movie.findMany()
+  console.dir(allMovies, { depth: null })
+  return allMovies;
+}
+
+async function addMovie(title, director) {
+  const newMovie = await prisma.movie.create({
+    data:{
+      title,
+      director
+    }
+  });
+  console.dir(newMovie, { depth: null });
+  return newMovie;
+}
+
 const resolvers = {
   Query: {
-    hello: () => 'Hello, World!',
-    getUsers: async (parent, args, contextValue, info)=> {
+    getMovies: async ()=> {
       try {
-        const connection = await pool.getConnection();
-        console.log(args)
-        const [result] = await connection.query('select * from test WHERE name = ?', [args.name]);
-        connection.release()
-        return result
+        const movies = await getAllMovies()
+        await prisma.$disconnect()
+        return movies;
       }
       catch (e) {
+        await prisma.$disconnect()
         throw e
       }
-
     }
   },
   Mutation: {
-    addUser: async (parent, args, contextValue, info) => {
+    addMovie: async (parent, args) => {
       try {
-        console.log(args)
-        const connection = await pool.getConnection();
-        const [result] = await connection.query(`insert into test(name,age) values (?,?)`, [args.name, args.age]);
-        connection.release()
-        return result;
+        const newMovie = await addMovie(args.title, args.director);
+        await prisma.$disconnect();
+        return newMovie;
       }
       catch (e) {
-        throw e
+        await prisma.$disconnect();
+        throw e;
       }
     }
   }

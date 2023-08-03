@@ -13,9 +13,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query hello {\n    hello\n  }\n": types.HelloDocument,
-    "\n  query getUsers($name: String!) {\n    getUsers(name: $name) {\n      name\n      age\n    }\n  }\n": types.GetUsersDocument,
-    "\n  mutation createUser($name: String!, $age: Int!) {\n    addUser(name:$name, age:$age) {\n      name\n      age\n    }\n  }\n": types.CreateUserDocument,
+    "\n  query getMovies {\n    getMovies {\n      title\n      director\n    }\n  }\n": types.GetMoviesDocument,
+    "\n  mutation createMovie($title: String!, $director: String!) {\n    addMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n": types.CreateMovieDocument,
 };
 
 /**
@@ -35,15 +34,11 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query hello {\n    hello\n  }\n"): (typeof documents)["\n  query hello {\n    hello\n  }\n"];
+export function graphql(source: "\n  query getMovies {\n    getMovies {\n      title\n      director\n    }\n  }\n"): (typeof documents)["\n  query getMovies {\n    getMovies {\n      title\n      director\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query getUsers($name: String!) {\n    getUsers(name: $name) {\n      name\n      age\n    }\n  }\n"): (typeof documents)["\n  query getUsers($name: String!) {\n    getUsers(name: $name) {\n      name\n      age\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  mutation createUser($name: String!, $age: Int!) {\n    addUser(name:$name, age:$age) {\n      name\n      age\n    }\n  }\n"): (typeof documents)["\n  mutation createUser($name: String!, $age: Int!) {\n    addUser(name:$name, age:$age) {\n      name\n      age\n    }\n  }\n"];
+export function graphql(source: "\n  mutation createMovie($title: String!, $director: String!) {\n    addMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n"): (typeof documents)["\n  mutation createMovie($title: String!, $director: String!) {\n    addMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

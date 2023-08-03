@@ -7,42 +7,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @db.Timestamp(0)
-  content   String?  @db.Text
-  published Boolean  @default(false)
-  authorId  Int
-  author      User     @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_ibfk_1")
-  tags      Tag[]
+model Comment {
+  comment_id Int    @id @default(autoincrement())
+  review_id  Int
+  content    String @db.VarChar(256)
+  review     Review @relation(fields: [review_id], references: [review_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Review_TO_Comment_1")
 
-  @@index([authorId], map: "authorId")
+  @@index([review_id], map: "FK_Review_TO_Comment_1")
 }
 
-model Profile {
-  id     Int     @id @default(autoincrement())
-  bio    String? @db.Text
-  userId Int     @unique(map: "userId")
-  user   User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "profile_ibfk_1")
+model Movie {
+  id       Int      @id @default(autoincrement())
+  title    String   @db.VarChar(64)
+  director String   @db.VarChar(64)
+  reviews   Review[]
 }
 
-model User {
-  id      Int      @id @default(autoincrement())
-  name    String?  @db.VarChar(255)
-  email   String   @unique(map: "email") @db.VarChar(255)
-  posts    Post[]
-  profile Profile?
-}
+model Review {
+  review_id Int       @id @default(autoincrement())
+  movie_id  Int
+  title     String    @db.VarChar(64)
+  content   String    @db.VarChar(256)
+  comments   Comment[]
+  movie     Movie     @relation(fields: [movie_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Movie_TO_Review_1")
 
-model Tag {
-  id    Int    @id @default(autoincrement())
-  name  String
-  posts Post[]
-}
-
-model test {
-  id   Int    @id @default(autoincrement())
-  name String @db.VarChar(10)
-  age  Int
+  @@index([movie_id], map: "FK_Movie_TO_Review_1")
 }

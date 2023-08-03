@@ -5,51 +5,46 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { graphql } from './gql'
 
 import request from 'graphql-request'
+import useInput from './hooks/useInput';
 
 const graphQLEndpoint = 'http://localhost:3500/graphql';
 
-const hello : any = graphql(/* GraphQL */ `
-  query hello {
-    hello
-  }
-`);
 
-const getUsers :any = graphql(/* GraphQL */ `
-  query getUsers($name: String!) {
-    getUsers(name: $name) {
-      name
-      age
+const getMovies :any = graphql(/* GraphQL */ `
+  query getMovies {
+    getMovies {
+      title
+      director
     }
   }
 `);
 
-const createUser:any = graphql(/* GraphQL */ `
-  mutation createUser($name: String!, $age: Int!) {
-    addUser(name:$name, age:$age) {
-      name
-      age
+const addMovie: any = graphql(/* GraphQL */ `
+  mutation createMovie($title: String!, $director: String!) {
+    addMovie(title:$title, director:$director) {
+      title
+      director
     }
   }
 `)
 
 function App() {
+  const titleInputProps = useInput('');
+  const directorInputProps = useInput('');
 
-  const { data, isLoading } : {data:any, isLoading : boolean} = useQuery(['hello'], async () => 
-  request(graphQLEndpoint, hello,)
-  )
 
-  const { data : name } : {data:any} = useQuery(['users'], async () => 
-    request(
+  const { data } : any = useQuery(
+    ['movies'],
+    async () => request(
       graphQLEndpoint,
-      getUsers,
-      { name : 'jerry'}
-    ),
+      getMovies,
+      )
   )
 
   const mutation = useMutation( async () => request(
     graphQLEndpoint,
-    createUser,
-    {name:'jerry' ,age:20}
+    addMovie,
+    {title: titleInputProps.value ,director: directorInputProps.value}
   ), {
     onSuccess: ()=> {
       console.log('mutation success')
@@ -60,14 +55,15 @@ function App() {
 
   return (
     <>
-    <div>
-      {data && JSON.stringify(data)}
-      {name && JSON.stringify(name)}
-    </div>
+      {data && data.getMovies.map((movie:any,index:number)=>(
+        <div key={index}>title : {movie.title} <br/> director : {movie.director}</div>
+      ))}
+    <input placeholder='영화 제목' {...titleInputProps} />
+    <input placeholder='영화 감독' {...directorInputProps} />
     <button 
       onClick={()=> mutation.mutate()}
     >
-      name:jerry, age: 20인 data db 추가
+      영화 추가
     </button>
     </>
   );
