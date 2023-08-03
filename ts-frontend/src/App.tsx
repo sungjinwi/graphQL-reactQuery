@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { graphql } from './gql'
 
 import request from 'graphql-request'
@@ -32,6 +32,8 @@ function App() {
   const titleInputProps = useInput('');
   const directorInputProps = useInput('');
 
+  const queryClient = useQueryClient();
+
 
   const { data } : any = useQuery(
     ['movies'],
@@ -47,7 +49,8 @@ function App() {
     {title: titleInputProps.value ,director: directorInputProps.value}
   ), {
     onSuccess: ()=> {
-      console.log('mutation success')
+      console.log('mutation success');
+      queryClient.invalidateQueries(['movies']);
     }
   },);
 
