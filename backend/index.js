@@ -22,19 +22,32 @@ const typeDefs = `
 
   type Query {
     hello: String,
-    getMovies: [Movie]
+    getMovies: [Movie],
+    getMovie(id: Int): Movie
   }
 
   type Mutation {
-    addMovie(title: String, director: String) : Movie
+    addMovie(title: String, director: String) : Movie,
+    updateMovie(title: String, director: String) : Movie
+    deleteMovie(id: Int) : Int
   }
 `;
 
 async function getAllMovies() {
-  
   const allMovies = await prisma.movie.findMany()
-  console.dir(allMovies, { depth: null })
+  // console.dir(allMovies, { depth: null })
   return allMovies;
+}
+
+const getMovieById = async (id) => {
+  console.log("movieById start")
+  const movieById = await prisma.movie.findUnique({
+    where: {
+      id : id
+    }
+  })
+  console.log("movieById : " + JSON.stringify(movieById))
+  return movieById;
 }
 
 async function addMovie(title, director) {
@@ -46,6 +59,29 @@ async function addMovie(title, director) {
   });
   console.dir(newMovie, { depth: null });
   return newMovie;
+}
+
+const updateMovie = async (title, director) => {
+  const newMovie = await prisma.movie.update({
+    where : {
+      id: 2,
+    },
+    data: {
+      title,
+      director
+    }
+  });
+  console.log(newMovie)
+  return newMovie;
+}
+
+const deleteMovie = async (id) => {
+  const deleteId = await prisma.movie.delete({
+    where : {
+      id : id
+    }
+  })
+  return deleteId;
 }
 
 const resolvers = {
@@ -60,6 +96,15 @@ const resolvers = {
         await prisma.$disconnect()
         throw e
       }
+    },
+    getMovie: async (parent, args)=> {
+      try {
+        const movie = await getMovieById(args.id);
+        return movie;
+      }
+      catch (e) {
+        throw e;
+      }
     }
   },
   Mutation: {
@@ -68,6 +113,28 @@ const resolvers = {
         const newMovie = await addMovie(args.title, args.director);
         await prisma.$disconnect();
         return newMovie;
+      }
+      catch (e) {
+        await prisma.$disconnect();
+        throw e;
+      }
+    },
+    updateMovie: async (parent, args) => {
+      try {
+        const newMovie = await updateMovie(args.title, args.director);
+        await prisma.$disconnect();
+        return newMovie;
+      }
+      catch (e) {
+        await prisma.$disconnect();
+        throw e;
+      }
+    },
+    deleteMovie: async (parent, args) => {
+      try {
+        const resultId = await deleteMovie(args.id);
+        await prisma.$disconnect();
+        return resultId;
       }
       catch (e) {
         await prisma.$disconnect();
