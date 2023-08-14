@@ -1,23 +1,30 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { graphql } from '../gql'; 
 import request from 'graphql-request'
 import useInput from '../hooks/useInput'
 import { styled } from 'styled-components';
 import MovieCard from './MovieCard';
-import { useNavigate } from 'react-router-dom';
 
 const graphQLEndpoint = 'http://localhost:3500/graphql';
 
 const getMovies :any = graphql(/* GraphQL */ `
-  query getMovies {
-    getMovies {
-      id
-      title
-      director
+  query getMovies ($first: Int, $after: String) {
+    getMovies (first: $first, after: $after) {
+      edges {
+        node {
+          id
+          title
+          director
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
     }
   }
 `);
-
 
 const addMovie: any = graphql(/* GraphQL */ `
   mutation createMovie($title: String!, $director: String!) {
@@ -44,7 +51,6 @@ const deleteMovie: any = graphql( /* GraphQL */`
 `);
 
 
-
 const Main = () => {
 
 
@@ -54,21 +60,19 @@ const Main = () => {
   const queryClient = useQueryClient();
 
 
-
   const { data, fetchNextPage, hasNextPage} :any = useInfiniteQuery({
     queryKey : ['infiniteMovies'],
-    queryFn : async ({pageParam = 0}) => request(
+    queryFn : async ({pageParam = "1"}) => request(
       graphQLEndpoint,
       getMovies,
+      {first:3, after: pageParam}
     ),
     getNextPageParam: (lastPage:any, pages) => {
-      return lastPage.getMovies.length +1
+      return lastPage.getMovies.pageInfo.endCursor
     }
-    
     })
 
-    const pageMovie = data?.pages.slice(-1)[0].getMovies
-
+  const pages = data?.pages;
 
   const addMutation = useMutation( async () => request(
     graphQLEndpoint,
@@ -85,7 +89,6 @@ const Main = () => {
       )
     }
   },);
-
 
   const updateMutation = useMutation( async () => request(
     graphQLEndpoint,
@@ -104,10 +107,18 @@ const Main = () => {
   return (
     <>
     <MovieCardsContainer>
-      {pageMovie && pageMovie.map((movie:any )=>(
-        <MovieCard key={movie?.id} id={movie?.id} title={movie?.title} director={movie?.director}/>
-      ))}
+      {data && 
+      pages?.map((page:any)=> 
+        page.getMovies.edges.map(({node}:{node:any})=> 
+          <MovieCard key={node?.id} id={node?.id} title={node?.title} director={node?.director}/>
+        ))
+      }
     </MovieCardsContainer>
+    <div style={{margin:'20px'}}>
+      <button onClick={()=> fetchNextPage()}>
+        fetchNext
+      </button>
+    </div>
     <input placeholder='영화 제목' {...titleInputProps} />
     <input placeholder='영화 감독' {...directorInputProps} />
     <button 
@@ -115,11 +126,7 @@ const Main = () => {
     >
       영화 추가
     </button>
-    <button 
-      onClick={()=> fetchNextPage()}
-    >
-      fetchNext
-    </button>
+    
     </>
   )
 }

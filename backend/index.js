@@ -20,9 +20,26 @@ const typeDefs = `
     director: String
   }
 
+  type MovieEdge {
+    cursor: String
+    node: Movie
+  }
+
+  type MovieConnection {
+    edges: [MovieEdge]
+    pageInfo: PageInfo
+  }
+
+  type PageInfo {
+    hasNextPage: Boolean
+    hasPreviousPage: Boolean
+    startCursor: String
+    endCursor: String
+  }
+
   type Query {
     hello: String,
-    getMovies: [Movie],
+    getMovies(first: Int, after: String): MovieConnection,
     getMovie(id: Int): Movie
   }
 
@@ -33,9 +50,19 @@ const typeDefs = `
   }
 `;
 
-async function getAllMovies() {
-  const allMovies = await prisma.movie.findMany()
-  // console.dir(allMovies, { depth: null })
+async function getAllMovies(first, after) {
+
+  const pageSize = first || 2;
+
+  const allMovies = await prisma.movie.findMany({
+    take: pageSize,
+    skip: after != "1" ? 1 : 0,
+    cursor: after ? {id: parseInt(after)} : undefined,
+    orderBy: {
+      id: 'asc'
+    }
+  })
+  console.dir(allMovies, { depth: null })
   return allMovies;
 }
 
@@ -61,17 +88,17 @@ async function addMovie(title, director) {
   return newMovie;
 }
 
-const updateMovie = async (title, director) => {
+const updateMovie = async (id, title, director) => {
   const newMovie = await prisma.movie.update({
     where : {
-      id: 2,
+      id: id,
     },
     data: {
       title,
       director
     }
   });
-  console.log(newMovie)
+  console.log(newMovie + "added")
   return newMovie;
 }
 
@@ -81,16 +108,29 @@ const deleteMovie = async (id) => {
       id : id
     }
   })
+  console.log("delete success")
   return deleteId;
 }
 
 const resolvers = {
   Query: {
-    getMovies: async ()=> {
+    getMovies: async (parent, {first, after})=> {
       try {
-        const movies = await getAllMovies()
+        const movies = await getAllMovies(first, after);
         await prisma.$disconnect()
-        return movies;
+        
+        return {
+          edges: movies.map(movie=> ({
+            cursor: movie.id.toString(),
+            node: movie
+          })),
+          pageInfo: {
+            hasNextPage: false,
+            hasPreviousPage: false,
+            startCursor: movies.length > 0 ? movies[0].id : null,
+            endCursor: movies.length > 0 ? movies[movies.length - 1].id.toString() : null,
+          }
+        }
       }
       catch (e) {
         await prisma.$disconnect()
@@ -107,6 +147,7 @@ const resolvers = {
       }
     }
   },
+  
   Mutation: {
     addMovie: async (parent, args) => {
       try {
