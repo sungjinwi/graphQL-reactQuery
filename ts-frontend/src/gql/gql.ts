@@ -14,10 +14,10 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  query getMovies {\n    getMovies {\n      id\n      title\n      director\n    }\n  }\n": types.GetMoviesDocument,
-    "\n  query getMovie($id: Int) {\n    getMovie(id:$id) {\n      title\n      director\n    }\n  }\n": types.GetMovieDocument,
     "\n  mutation createMovie($title: String!, $director: String!) {\n    addMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n": types.CreateMovieDocument,
     "\n  mutation updateMovie($title: String, $director: String) {\n    updateMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n": types.UpdateMovieDocument,
     "\n  mutation delteMovieById($id: Int!) {\n    deleteMovie(id:$id)\n  }\n": types.DelteMovieByIdDocument,
+    "\n  query getMovie($id: Int) {\n    getMovie(id:$id) {\n      title\n      director\n    }\n  }\n": types.GetMovieDocument,
 };
 
 /**
@@ -41,10 +41,6 @@ export function graphql(source: "\n  query getMovies {\n    getMovies {\n      i
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query getMovie($id: Int) {\n    getMovie(id:$id) {\n      title\n      director\n    }\n  }\n"): (typeof documents)["\n  query getMovie($id: Int) {\n    getMovie(id:$id) {\n      title\n      director\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function graphql(source: "\n  mutation createMovie($title: String!, $director: String!) {\n    addMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n"): (typeof documents)["\n  mutation createMovie($title: String!, $director: String!) {\n    addMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -54,6 +50,10 @@ export function graphql(source: "\n  mutation updateMovie($title: String, $direc
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation delteMovieById($id: Int!) {\n    deleteMovie(id:$id)\n  }\n"): (typeof documents)["\n  mutation delteMovieById($id: Int!) {\n    deleteMovie(id:$id)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query getMovie($id: Int) {\n    getMovie(id:$id) {\n      title\n      director\n    }\n  }\n"): (typeof documents)["\n  query getMovie($id: Int) {\n    getMovie(id:$id) {\n      title\n      director\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
