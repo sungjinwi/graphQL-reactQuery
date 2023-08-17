@@ -4,6 +4,7 @@ import request from 'graphql-request'
 import useInput from '../hooks/useInput'
 import { styled } from 'styled-components';
 import MovieCard from './MovieCard';
+import {produce} from 'immer';
 
 const graphQLEndpoint = 'http://localhost:3500/graphql';
 
@@ -70,23 +71,31 @@ const Main = () => {
     getNextPageParam: (lastPage:any, pages) => {
       return lastPage.getMovies.pageInfo.endCursor
     }
-    })
+  })
 
   const pages = data?.pages;
+
+  console.log(hasNextPage)
+
 
   const addMutation = useMutation( async () => request(
     graphQLEndpoint,
     addMovie,
     {title: titleInputProps.value ,director: directorInputProps.value}
   ), {
-    onSuccess: (result)=> {
-      console.log('mutation success');
-      console.log(result)
-      const onUpdateResult =  queryClient.setQueryData(['movies'], (oldData:any) => oldData ? {
-        ...oldData,
-      } 
-      : oldData
-      )
+    onSuccess: (result:any)=> {
+      console.log('addition success');
+      console.log(result);
+      const updatedMovies = produce(data, (draft:any)=>{
+        draft.pages.at(-1).getMovies.edges.push({node:{...result?.addMovie, id:0}})
+      });
+      console.log(data?.pages.at(-1).length)
+      if (data?.pages.at(-1).getMovies.edges.length != 3) {
+        queryClient.setQueryData(['infiniteMovies'], (oldData:any) => oldData ? 
+        updatedMovies
+        : oldData
+        )
+      }
     }
   },);
 
@@ -107,17 +116,19 @@ const Main = () => {
   return (
     <>
     <MovieCardsContainer>
-      {data && 
-      pages?.map((page:any)=> 
+      {pages?.map((page:any)=> 
         page.getMovies.edges.map(({node}:{node:any})=> 
           <MovieCard key={node?.id} id={node?.id} title={node?.title} director={node?.director}/>
         ))
       }
     </MovieCardsContainer>
     <div style={{margin:'20px'}}>
-      <button onClick={()=> fetchNextPage()}>
+      { 
+        hasNextPage &&
+        <button onClick={()=> fetchNextPage()}>
         fetchNext
-      </button>
+        </button>
+      }
     </div>
     <input placeholder='영화 제목' {...titleInputProps} />
     <input placeholder='영화 감독' {...directorInputProps} />

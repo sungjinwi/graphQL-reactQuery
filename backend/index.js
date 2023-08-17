@@ -53,11 +53,17 @@ const typeDefs = `
 async function getAllMovies(first, after) {
 
   const pageSize = first || 2;
+  console.log(after)
 
+  if(after===null) {
+    return false;
+  }
+  
   const allMovies = await prisma.movie.findMany({
     take: pageSize,
     skip: after != "1" ? 1 : 0,
-    cursor: after ? {id: parseInt(after)} : undefined,
+    // cursor: after ? {id: parseInt(after)} : undefined,
+    cursor: {id: parseInt(after)},
     orderBy: {
       id: 'asc'
     }
@@ -125,7 +131,7 @@ const resolvers = {
             node: movie
           })),
           pageInfo: {
-            hasNextPage: false,
+            hasNextPage: !!movies,
             hasPreviousPage: false,
             startCursor: movies.length > 0 ? movies[0].id : null,
             endCursor: movies.length > 0 ? movies[movies.length - 1].id.toString() : null,
