@@ -6,7 +6,7 @@ import { styled } from 'styled-components';
 import MovieCard from './MovieCard';
 import {produce} from 'immer';
 
-const graphQLEndpoint = 'http://localhost:3500/graphql';
+const graphQLEndpoint = 'http://15.164.221.248:3500/graphql';
 
 const getMovies :any = graphql(/* GraphQL */ `
   query getMovies ($first: Int, $after: String) {

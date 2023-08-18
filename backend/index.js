@@ -11,6 +11,9 @@ dotenv.config();
 
 const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+
 const prisma = new PrismaClient()
 
 const typeDefs = `
@@ -200,6 +203,8 @@ const server = new ApolloServer({
 });
 
 await server.start();
+
+app.get('/',(req,res)=>{return res.send("sss")})
 
 app.use('/graphql', cors(), express.json(), expressMiddleware(server));
 

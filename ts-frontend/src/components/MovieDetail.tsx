@@ -5,7 +5,7 @@ import { graphql } from '../gql';
 import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
 
-const graphQLEndpoint = 'http://localhost:3500/graphql';
+const graphQLEndpoint = 'http://15.164.221.248:3500/graphql';
 
 
 const getMovieById:any = graphql(/* GraphQL */ `
