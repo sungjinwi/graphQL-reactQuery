@@ -53,6 +53,7 @@ const deleteMovie: any = graphql( /* GraphQL */`
 
 
 const Main = () => {
+  const getTest = fetch("http://15.164.221.248:3500").then(data=>console.log(data))
 
 
   const titleInputProps = useInput('');
