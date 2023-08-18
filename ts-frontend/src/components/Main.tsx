@@ -61,7 +61,7 @@ const Main = () => {
   const queryClient = useQueryClient();
 
 
-  const { data, fetchNextPage, hasNextPage} :any = useInfiniteQuery({
+  const { data, fetchNextPage} :any = useInfiniteQuery({
     queryKey : ['infiniteMovies'],
     queryFn : async ({pageParam = "1"}) => request(
       graphQLEndpoint,
@@ -74,6 +74,8 @@ const Main = () => {
   })
 
   const pages = data?.pages;
+
+  const hasNextPage = pages?.at(-1).getMovies.pageInfo.hasNextPage
 
   console.log(hasNextPage)
 
