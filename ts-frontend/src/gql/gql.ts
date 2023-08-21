@@ -13,11 +13,11 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query getMovies ($first: Int, $after: String) {\n    getMovies (first: $first, after: $after) {\n      edges {\n        node {\n          id\n          title\n          director\n        }\n        cursor\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n": types.GetMoviesDocument,
     "\n  mutation createMovie($title: String!, $director: String!) {\n    addMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n": types.CreateMovieDocument,
     "\n  mutation updateMovie($title: String, $director: String) {\n    updateMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n": types.UpdateMovieDocument,
     "\n  mutation delteMovieById($id: Int!) {\n    deleteMovie(id:$id)\n  }\n": types.DelteMovieByIdDocument,
-    "\n  query getMovie($id: Int) {\n    getMovie(id:$id) {\n      title\n      director\n    }\n  }\n": types.GetMovieDocument,
+    "\n  query movie($id: Int) {\n    movie(id:$id) {\n      title\n      director\n    }\n  }\n": types.MovieDocument,
+    "\n  query Movies ($first: Int, $after: String) {\n    movies (first: $first, after: $after) {\n      edges {\n        node {\n          id\n          title\n          director\n        }\n        cursor\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n": types.MoviesDocument,
 };
 
 /**
@@ -37,10 +37,6 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query getMovies ($first: Int, $after: String) {\n    getMovies (first: $first, after: $after) {\n      edges {\n        node {\n          id\n          title\n          director\n        }\n        cursor\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"): (typeof documents)["\n  query getMovies ($first: Int, $after: String) {\n    getMovies (first: $first, after: $after) {\n      edges {\n        node {\n          id\n          title\n          director\n        }\n        cursor\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function graphql(source: "\n  mutation createMovie($title: String!, $director: String!) {\n    addMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n"): (typeof documents)["\n  mutation createMovie($title: String!, $director: String!) {\n    addMovie(title:$title, director:$director) {\n      title\n      director\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -53,7 +49,11 @@ export function graphql(source: "\n  mutation delteMovieById($id: Int!) {\n    d
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query getMovie($id: Int) {\n    getMovie(id:$id) {\n      title\n      director\n    }\n  }\n"): (typeof documents)["\n  query getMovie($id: Int) {\n    getMovie(id:$id) {\n      title\n      director\n    }\n  }\n"];
+export function graphql(source: "\n  query movie($id: Int) {\n    movie(id:$id) {\n      title\n      director\n    }\n  }\n"): (typeof documents)["\n  query movie($id: Int) {\n    movie(id:$id) {\n      title\n      director\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Movies ($first: Int, $after: String) {\n    movies (first: $first, after: $after) {\n      edges {\n        node {\n          id\n          title\n          director\n        }\n        cursor\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"): (typeof documents)["\n  query Movies ($first: Int, $after: String) {\n    movies (first: $first, after: $after) {\n      edges {\n        node {\n          id\n          title\n          director\n        }\n        cursor\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
