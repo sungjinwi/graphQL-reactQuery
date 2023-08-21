@@ -44,8 +44,8 @@ const typeDefs = `
 
   type Query {
     hello: String,
-    getMovies(first: Int, after: String): MovieConnection,
-    getMovie(id: Int): Movie
+    movies(first: Int, after: String): MovieConnection,
+    movie(id: Int): Movie
   }
 
   type Mutation {
@@ -122,7 +122,7 @@ const deleteMovie = async (id) => {
 
 const resolvers = {
   Query: {
-    getMovies: async (parent, {first, after})=> {
+    movies: async (parent, {first, after})=> {
       try {
         const movies = await getAllMovies(first, after);
         const lastMovie = await prisma.movie.findFirst({
@@ -151,7 +151,7 @@ const resolvers = {
         throw e
       }
     },
-    getMovie: async (parent, args)=> {
+    movie: async (parent, args)=> {
       try {
         const movie = await getMovieById(args.id);
         return movie;
