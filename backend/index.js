@@ -187,9 +187,9 @@ const resolvers = {
     },
     deleteMovie: async (parent, args) => {
       try {
-        const resultId = await deleteMovie(args.id);
+        await deleteMovie(args.id);
         await prisma.$disconnect();
-        return resultId;
+        return args.id;
       }
       catch (e) {
         await prisma.$disconnect();

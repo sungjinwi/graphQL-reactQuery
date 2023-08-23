@@ -1,0 +1,1 @@
+export const graphQLEndpoint = 'http://15.164.221.248:3500/graphql';

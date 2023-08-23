@@ -1,6 +1,6 @@
 import { graphql } from "../../gql/gql";
 
-const getMovies :any = graphql(/* GraphQL */ `
+const getMovieList :any = graphql(/* GraphQL */ `
   query Movies ($first: Int, $after: String) {
     movies (first: $first, after: $after) {
       edges {
@@ -20,4 +20,4 @@ const getMovies :any = graphql(/* GraphQL */ `
 `);
 
 
-export default getMovies;
+export default getMovieList;
