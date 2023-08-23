@@ -1,29 +1,16 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { styled } from 'styled-components';
-import { useQuery } from '@tanstack/react-query';
-import request from 'graphql-request';
-import { getMovieById } from '../graphql/queries';
+import useQueryMovie from '../hooks/useQueryMovie';
 
-const graphQLEndpoint = 'http://15.164.221.248:3500/graphql';
 
 
 const MovieDetail = () => {
   const navigate = useNavigate();
   const params = useParams();
-  const id = Number(params.id)
+  const id = Number(params.id);
 
-  const { data } : any = useQuery(
-    ['movie', {id}],
-    async ()=> request(
-      graphQLEndpoint,
-      getMovieById,
-      {id}
-    )
-  )
+  const movie = useQueryMovie(id);
 
-  const movie = data?.movie;
-
-  
   return (
   <Page>
     <Container>
